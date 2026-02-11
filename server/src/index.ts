@@ -19,7 +19,14 @@ const port = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve uploaded files
 app.use('/uploads', express.static('uploads'));
+
+// Serve static files from the React app
+const __dirname = path.resolve();
+const clientPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientPath));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -28,14 +35,15 @@ app.use('/api/cards', cardRoutes);
 app.use('/api/budgets', budgetRoutes);
 app.use('/api/audit', auditRoutes);
 
-// Root route
-app.get('/', (req, res) => {
-    res.json({ status: 'ok', message: 'Mizan API is running', timestamp: new Date() });
-});
-
 // Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Mizan API is running', timestamp: new Date() });
+});
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'));
 });
 
 app.listen(port, () => {

@@ -232,7 +232,7 @@ const Expenses: React.FC = () => {
                                         <td className="px-8 py-6">
                                             {expense.receiptUrl ? (
                                                 <a
-                                                    href={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${expense.receiptUrl}`}
+                                                    href={`${import.meta.env.VITE_API_BASE_URL || ''}${expense.receiptUrl}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="w-8 h-8 flex items-center justify-center bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-colors"
