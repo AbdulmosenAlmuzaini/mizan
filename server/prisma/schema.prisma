@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  ACCOUNTANT
+  EMPLOYEE
+  VIEWER
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model Company {
+  id           String        @id @default(uuid())
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  users        User[]
+  cards        Card[]
+  expenses     Expense[]
+  budgets      Budget[]
+  auditLogs    AuditLog[]
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  password     String
+  firstName    String
+  lastName     String
+  role         Role          @default(EMPLOYEE)
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  expenses     Expense[]
+  auditLogs    AuditLog[]
+}
+
+model Card {
+  id           String        @id @default(uuid())
+  lastFour     String
+  expiry       String
+  limit        Float
+  spent        Float         @default(0)
+  active       String        @default("true")
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id])
+  userId       String?
+  createdAt    DateTime      @default(now())
+}
+
+model Expense {
+  id           String        @id @default(uuid())
+  amount       Float
+  currency     String        @default("SAR")
+  description  String?
+  category     String
+  status       TransactionStatus @default(PENDING)
+  receiptUrl   String?
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Budget {
+  id           String        @id @default(uuid())
+  name         String
+  amount       Float
+  spent        Float         @default(0)
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model AuditLog {
+  id           String        @id @default(uuid())
+  action       String
+  details      String?
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  companyId    String
+  company      Company       @relation(fields: [companyId], references: [id])
+  createdAt    DateTime      @default(now())
+}
